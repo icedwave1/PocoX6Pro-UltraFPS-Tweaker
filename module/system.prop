@@ -1,20 +1,41 @@
-# Poco X6 Pro 5G (duchamp) - Pixel Experience Ultra FPS Props
-# SurfaceFlinger & Hardware Composer Tweaks
+# Poco X6 Pro 5G (duchamp) - Pixel Experience Ultra FPS & Low Latency Props
+# Dimensity 8300-Ultra / Mali-G615 Architecture Optimization
+
+# --- SurfaceFlinger & Rendering Pipeline ---
 debug.sf.disable_backpressure=1
 debug.sf.latch_unsignaled=1
+debug.sf.enable_gl_backpressure=0
 debug.sf.enable_hwc_vds=0
 ro.surface_flinger.max_frame_buffer_acquired_buffers=3
 debug.hwui.render_dirty_regions=false
+debug.hwui.fps_divisor=1
 debug.performance.tuning=1
 video.accelerate.hw=1
 debug.egl.hw=1
+debug.composition.type=gpu
+persist.sys.composition.type=gpu
 
-# Touch & Refresh Rate Smoothness
-windowsmgr.max_events_per_sec=300
+# --- Mali-G615 GPU & Vulkan Backend ---
+ro.hardware.egl=mali
+debug.vulkan.layers=0
+renderthread.render_ahead=1
+
+# --- Display 120Hz & Touch Smoothness ---
+windowsmgr.max_events_per_sec=360
 persist.vendor.power.dfps.enable=0
 persist.sys.spc.cpuprio=1
 persist.sys.perf.top=1
+view.touch_slop=2
+touch.pressure.scale=0.001
+touch.size.calibration=geometric
 
-# Network & Wi-Fi Low Latency
+# --- Network & Wi-Fi Ping Stabilization (Esports) ---
 net.tcp.2sendwindowsize=256000
 net.tcp.buffersize.wifi=524288,1048576,2097152,262144,524288,1048576
+net.ipv4.tcp_low_latency=1
+net.ipv4.tcp_fastopen=3
+
+# --- Low Latency Audio Pipeline ---
+af.fast_track_multiplier=1
+audio.deep_buffer.media=false
+vendor.audio.offload.buffer.size.kb=32

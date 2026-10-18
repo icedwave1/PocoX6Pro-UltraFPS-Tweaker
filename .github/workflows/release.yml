@@ -1,0 +1,54 @@
+name: Release Flashable Zip
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag name for release (e.g. v2.5)'
+        required: true
+        default: 'v2.5'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare zip package
+        run: |
+          cd module
+          # Ensure LF line endings for all scripts and text files
+          find . -type f \( -name "*.sh" -o -name "*.prop" -o -name "*.ini" -o -name "*.html" -o -name "*.css" -o -name "*.js" -o -name "updater-script" -o -name "update-binary" \) -exec sed -i -e 's/\r$//' {} +
+          # Create zip
+          zip -r9 ../PocoX6Pro-UltraFPS-Tweaker.zip . -x "*.git*"
+          cd ..
+          sha256sum PocoX6Pro-UltraFPS-Tweaker.zip > checksum.txt
+          cat checksum.txt
+
+      - name: Determine tag
+        id: vars
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ github.event.inputs.tag_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create GitHub Release and Upload Zip
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.vars.outputs.tag }}
+          name: "Poco X6 Pro 5G Ultra FPS Tweaker ${{ steps.vars.outputs.tag }}"
+          files: |
+            PocoX6Pro-UltraFPS-Tweaker.zip
+            checksum.txt
+          generate_release_notes: true
+          draft: false
+          prerelease: false

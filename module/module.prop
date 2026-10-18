@@ -1,6 +1,6 @@
 id=duchamp_tweaker
 name=Poco X6 Pro 5G Ultra FPS Tweaker (Duchamp)
-version=v2.0-Hardcore
-versionCode=200
+version=v2.5-Hardcore
+versionCode=250
 author=Antigravity, Claude
-description=Экстремальный FPS-твикер для Poco X6 Pro (Dimensity 8300 / Pixel Experience) с KernelSU WebUI. Устранение фризов, 120Hz lock, Ged Mali boost, uclamp EAS, анти-троттлинг.
+description=????????????? FPS & Anti-Stutter ?????? ??? Poco X6 Pro 5G (Dimensity 8300 / Pixel Experience) ? KernelSU WebUI. MTK GED Mali-G615, DVFSRC, UCLAMP, 120Hz Lock, Low-Ping, Thermal Bypass.
