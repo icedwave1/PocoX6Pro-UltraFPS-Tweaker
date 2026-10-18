@@ -1,21 +1,289 @@
-#!/system/bin/sh
-# Flush DNS, Reset network buffers & Re-enable Wi-Fi Low Latency Lock
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Poco X6 Pro 5G Ultra FPS Tweaker v2.5</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-titles">
+        <div class="tag-row">
+          <span class="device-tag">POCO X6 PRO 5G • DUCHAMP</span>
+          <span class="version-tag">v2.5 Hardcore</span>
+        </div>
+        <h1 class="main-title">ULTRA FPS TWEAKER</h1>
+        <span class="rom-badge">Pixel Experience / AOSP • Dimensity 8300-Ultra</span>
+      </div>
+      <div class="status-indicator-box">
+        <div id="statusDot" class="status-dot active"></div>
+        <span id="statusText" class="status-label">EXTREME</span>
+      </div>
+    </header>
 
-echo "[Network] Flushing local DNS resolver caches..."
-ndc resolver clearnetdns wlan0 2>/dev/null
-ndc resolver clearnetdns rmnet_data0 2>/dev/null
+    <!-- Master Switch Card -->
+    <section class="card master-switch-card">
+      <div class="master-info">
+        <div class="master-icon">⚡</div>
+        <div>
+          <div class="master-title">ГЛАВНЫЙ РУБИЛЬНИК</div>
+          <div class="master-desc">Мгновенная активация или возврат в сток AOSP</div>
+        </div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="masterToggle" checked>
+        <span class="slider round"></span>
+      </label>
+    </section>
 
-echo "[Network] Applying TCP Fast-Path & Congestion Control..."
-if grep -q "bbr" /proc/sys/net/ipv4/tcp_available_congestion_control 2>/dev/null; then
-    echo "bbr" > /proc/sys/net/ipv4/tcp_congestion_control 2>/dev/null
-fi
-echo 1 > /proc/sys/net/ipv4/tcp_low_latency 2>/dev/null
-echo 16384 > /proc/sys/net/ipv4/tcp_notsent_lowat 2>/dev/null
+    <!-- Telemetry Bar -->
+    <section class="card telemetry-card">
+      <div class="section-title">
+        <span>МОНИТОРИНГ ЖЕЛЕЗА & ЧАСТОТ</span>
+        <button id="refreshBtn" class="mini-btn">🔄 Обновить</button>
+      </div>
 
-echo "[Network] Locking Wi-Fi Driver to Esports Low-Latency Mode..."
-cmd wifi set-low-latency-mode enabled 2>/dev/null
-svc wifi set-multicast-enabled true 2>/dev/null
-iw dev wlan0 set power_save off 2>/dev/null
+      <!-- Quick Metrics -->
+      <div class="telemetry-grid">
+        <div class="tele-item">
+          <span class="tele-label">ЦПУ (AP)</span>
+          <span class="tele-value" id="valCpuTemp">--°C</span>
+        </div>
+        <div class="tele-item">
+          <span class="tele-label">БАТАРЕЯ</span>
+          <span class="tele-value" id="valBatTemp">--°C</span>
+        </div>
+        <div class="tele-item">
+          <span class="tele-label">ТОК (РАЗРЯД)</span>
+          <span class="tele-value" id="valBatCur">-- mA</span>
+        </div>
+        <div class="tele-item">
+          <span class="tele-label">ЭКРАН</span>
+          <span class="tele-value highlight" id="valFps">120 Hz</span>
+        </div>
+      </div>
 
-echo "Network optimized! Ping jitter minimized."
-exit 0
+      <!-- 8-Core CPU Visualizer -->
+      <div class="cores-section">
+        <div class="cores-header">
+          <span>Частоты ядер CPU (MT6897)</span>
+          <span id="valGov" class="badge-mini">schedutil</span>
+        </div>
+        <div class="cores-grid">
+          <div class="core-box"><span class="c-num">C0 (A510)</span><span class="c-f" id="c0">--</span></div>
+          <div class="core-box"><span class="c-num">C1 (A510)</span><span class="c-f" id="c1">--</span></div>
+          <div class="core-box"><span class="c-num">C2 (A510)</span><span class="c-f" id="c2">--</span></div>
+          <div class="core-box"><span class="c-num">C3 (A510)</span><span class="c-f" id="c3">--</span></div>
+          <div class="core-box mid"><span class="c-num">C4 (A715)</span><span class="c-f" id="c4">--</span></div>
+          <div class="core-box mid"><span class="c-num">C5 (A715)</span><span class="c-f" id="c5">--</span></div>
+          <div class="core-box mid"><span class="c-num">C6 (A715)</span><span class="c-f" id="c6">--</span></div>
+          <div class="core-box big"><span class="c-num">C7 (Prime)</span><span class="c-f" id="c7">--</span></div>
+        </div>
+      </div>
+
+      <!-- Memory & Network Row -->
+      <div class="sub-telemetry-row">
+        <div class="sub-item"><span>ОЗУ Доступно:</span> <strong id="valRam">--</strong></div>
+        <div class="sub-item"><span>ZRAM:</span> <strong id="valZram">--</strong></div>
+        <div class="sub-item"><span>TCP Алгоритм:</span> <strong id="valTcp">BBR</strong></div>
+      </div>
+    </section>
+
+    <!-- Profiles Selection -->
+    <section class="card">
+      <div class="section-title">ПРОФИЛИ ПРОИЗВОДИТЕЛЬНОСТИ</div>
+      <div class="profiles-grid">
+        <button class="profile-btn active" data-profile="extreme">
+          <div class="p-icon">🚀</div>
+          <div class="p-name">EXTREME</div>
+          <div class="p-sub">Хардкор 100% FPS, No Throttling</div>
+        </button>
+        <button class="profile-btn" data-profile="esports">
+          <div class="p-icon">🎯</div>
+          <div class="p-name">ESPORTS</div>
+          <div class="p-sub">Low-Ping, 120Hz & Zero-Input-Lag</div>
+        </button>
+        <button class="profile-btn" data-profile="balanced">
+          <div class="p-icon">⚡</div>
+          <div class="p-name">BALANCED</div>
+          <div class="p-sub">Плавность без перегрева батареи</div>
+        </button>
+        <button class="profile-btn" data-profile="battery">
+          <div class="p-icon">🔋</div>
+          <div class="p-name">BATTERY</div>
+          <div class="p-sub">Энергосбережение и холод</div>
+        </button>
+        <button class="profile-btn" data-profile="stock">
+          <div class="p-icon">🔄</div>
+          <div class="p-name">STOCK</div>
+          <div class="p-sub">Заводские настройки AOSP</div>
+        </button>
+      </div>
+    </section>
+
+    <!-- Granular Tweaks: CPU & GPU -->
+    <section class="card">
+      <div class="section-title">ЯДРА, GPU & ТЕРМОРЕЖИМ</div>
+      <div class="tweak-list">
+        <div class="tweak-item">
+          <div class="tweak-text">
+            <strong>❄️ Thermal Throttling Bypass</strong>
+            <span>Отключает сброс частот ядер и GPU при нагреве</span>
+          </div>
+          <label class="switch sm">
+            <input type="checkbox" id="toggleThermal" checked>
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <div class="tweak-item">
+          <div class="tweak-text">
+            <strong>🎮 MediaTek GED Mali-G615 Boost</strong>
+            <span>Агрессивный DVFS буст видеочипа и таймингов кадра</span>
+          </div>
+          <label class="switch sm">
+            <input type="checkbox" id="toggleGpu" checked>
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <div class="tweak-item">
+          <div class="tweak-text">
+            <strong>⚡ UCLAMP & EAS Top-App Priority</strong>
+            <span>100% мощности CPU для активного процесса игры</span>
+          </div>
+          <label class="switch sm">
+            <input type="checkbox" id="toggleUclamp" checked>
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <div class="tweak-item">
+          <div class="tweak-text">
+            <strong>💾 MediaTek DVFSRC LPDDR5X DRAM Boost</strong>
+            <span>Форсирование пиковой пропускной способности шины памяти</span>
+          </div>
+          <label class="switch sm">
+            <input type="checkbox" id="toggleDram" checked>
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Granular Tweaks: Display, Network & Latency -->
+    <section class="card">
+      <div class="section-title">ЭКРАН, ПИНГ & ЗАДЕРЖКИ</div>
+      <div class="tweak-list">
+        <div class="tweak-item">
+          <div class="tweak-text">
+            <strong>🖥️ Force 120Hz Refresh Lock</strong>
+            <span>Блокирует сброс герцовки до 60Hz в играх Pixel Experience</span>
+          </div>
+          <label class="switch sm">
+            <input type="checkbox" id="toggle120" checked>
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <div class="tweak-item">
+          <div class="tweak-text">
+            <strong>📶 Esports Gaming Ping & TCP BBR</strong>
+            <span>TCP BBR + Wi-Fi Low Latency Lock для стабильного пинга</span>
+          </div>
+          <label class="switch sm">
+            <input type="checkbox" id="toggleNetwork" checked>
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <div class="tweak-item">
+          <div class="tweak-text">
+            <strong>👆 360Hz Touch Sampling & Instant Response</strong>
+            <span>Минимальный slop и геометрическая калибровка касаний</span>
+          </div>
+          <label class="switch sm">
+            <input type="checkbox" id="toggleTouch" checked>
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <div class="tweak-item">
+          <div class="tweak-text">
+            <strong>🚀 UFS 4.0 Storage & Zero-Lag ZRAM Engine</strong>
+            <span>Устранение подгрузочных микростаттеров (page-cluster 0)</span>
+          </div>
+          <label class="switch sm">
+            <input type="checkbox" id="toggleIo" checked>
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <div class="tweak-item">
+          <div class="tweak-text">
+            <strong>🔇 Low-Latency Audio Stream</strong>
+            <span>Уменьшение буфера аудиовывода для мгновенных звуков шагов</span>
+          </div>
+          <label class="switch sm">
+            <input type="checkbox" id="toggleAudio" checked>
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <div class="tweak-item">
+          <div class="tweak-text">
+            <strong>🚫 Micro-Freeze Killer</strong>
+            <span>Отключение фонового ftrace и спама системного logd</span>
+          </div>
+          <label class="switch sm">
+            <input type="checkbox" id="toggleMicrofreeze" checked>
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </div>
+      <button id="saveConfigBtn" class="action-btn primary full">Применить все параметры</button>
+    </section>
+
+    <!-- Quick Action Tools -->
+    <section class="card">
+      <div class="section-title">ИНСТРУМЕНТЫ БЫСТРОГО ДЕЙСТВИЯ</div>
+      <div class="quick-actions-row">
+        <button id="boostGameBtn" class="action-btn success">
+          <span class="btn-icon">🎯</span>
+          <span>Boost активной игры (PID)</span>
+        </button>
+        <button id="cleanRamBtn" class="action-btn warning">
+          <span class="btn-icon">🧹</span>
+          <span>Очистить RAM и кэши</span>
+        </button>
+        <button id="networkFlushBtn" class="action-btn info">
+          <span class="btn-icon">📶</span>
+          <span>Сброс DNS & Ping Boost</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Console Log Viewer -->
+    <section class="card">
+      <div class="section-title">
+        <span>ЛОГ ВЫПОЛНЕНИЯ</span>
+        <button id="clearLogBtn" class="mini-btn">Очистить</button>
+      </div>
+      <pre id="consoleLog" class="console-box">Инициализация Poco X6 Pro 5G Ultra FPS Tweaker v2.5...</pre>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <span>Duchamp Ultra FPS Tweaker v2.5 • Antigravity & Claude • Powered by KernelSU</span>
+    </footer>
+  </div>
+
+  <!-- Custom In-App Toast -->
+  <div id="toast" class="toast">Параметры успешно применены!</div>
+
+  <script src="app.js"></script>
+</body>
+</html>
