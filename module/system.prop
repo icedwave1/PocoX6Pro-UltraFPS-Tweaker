@@ -1,0 +1,20 @@
+# Poco X6 Pro 5G (duchamp) - Pixel Experience Ultra FPS Props
+# SurfaceFlinger & Hardware Composer Tweaks
+debug.sf.disable_backpressure=1
+debug.sf.latch_unsignaled=1
+debug.sf.enable_hwc_vds=0
+ro.surface_flinger.max_frame_buffer_acquired_buffers=3
+debug.hwui.render_dirty_regions=false
+debug.performance.tuning=1
+video.accelerate.hw=1
+debug.egl.hw=1
+
+# Touch & Refresh Rate Smoothness
+windowsmgr.max_events_per_sec=300
+persist.vendor.power.dfps.enable=0
+persist.sys.spc.cpuprio=1
+persist.sys.perf.top=1
+
+# Network & Wi-Fi Low Latency
+net.tcp.2sendwindowsize=256000
+net.tcp.buffersize.wifi=524288,1048576,2097152,262144,524288,1048576
