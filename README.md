@@ -48,7 +48,7 @@
 ## 📦 Установка
 
 Готовый архив для прошивки:
-`PocoX6Pro-UltraFPS-Tweaker.zip`
+`c:\PocoX6Pro5G\PocoX6Pro-UltraFPS-Tweaker.zip`
 
 ### Способ 1: Через приложение KernelSU Manager (на телефоне)
 1. Скопируйте файл `PocoX6Pro-UltraFPS-Tweaker.zip` в память телефона.
@@ -59,7 +59,7 @@
 
 ### Способ 2: Через ADB (с компьютера)
 ```bash
-adb push PocoX6Pro-UltraFPS-Tweaker.zip /sdcard/
+adb push C:\PocoX6Pro5G\PocoX6Pro-UltraFPS-Tweaker.zip /sdcard/
 # Установка через ksud (если установлен):
 adb shell su -c "ksud module install /sdcard/PocoX6Pro-UltraFPS-Tweaker.zip"
 ```
@@ -78,3 +78,10 @@ adb shell su -c "ksud module install /sdcard/PocoX6Pro-UltraFPS-Tweaker.zip"
 .\build.ps1
 ```
 Скрипт автоматически нормализует окончания строк (CRLF -> LF) и упакует обновленный `PocoX6Pro-UltraFPS-Tweaker.zip`.
+
+---
+
+## 👥 Contributors
+
+* **Antigravity**
+* **Claude**
